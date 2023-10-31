@@ -18,8 +18,7 @@ class MainWindow:
         self.root.title("Control Escolar")
         self.root.geometry("1000x700")
         self.pestanas = ttk.Notebook(self.root)
-
-        frame_login = Login(self.pestanas)
+        frame_login = Login(self.pestanas,self)
         frame_usuarios = Usuarios(self.pestanas)
         frame_alumnos = Alumnos(self.pestanas)
         frame_maestros = Maestros(self.pestanas)
@@ -30,6 +29,7 @@ class MainWindow:
         frame_carrera = Carrera(self.pestanas)
         frame_planeacion = Planeacion(self.pestanas)
         frame_logout = Logout(self.pestanas)
+        
 
         self.pestanas.add(frame_login, text = "Login")
         self.pestanas.add(frame_usuarios, text = "Usuarios")
@@ -43,6 +43,24 @@ class MainWindow:
         self.pestanas.add(frame_logout, text = "Logout")
         
         self.pestanas.pack(fill="both", expand=True)
+         # Enlaza el evento de cambio de pestaña
+        self.pestanas.bind("<<NotebookTabChanged>>", lambda event: self.actualizar_pestanas())
+        
+    def actualizar_pestanas(self):
+        usuario_logeado = self.pestanas.winfo_children()[0].get_usuario_logeado()
+        if usuario_logeado:
+            self.pestanas.tab(0, state="hidden")
+            for i in range(1, self.pestanas.index("end")):
+                if usuario_logeado.perfil==1:
+                    self.pestanas.tab(i, state="normal")
+                elif usuario_logeado.perfil == 2:
+                    self.pestanas.tab(2, state="normal")
+                    self.pestanas.tab(3, state="normal")
+                    self.pestanas.tab(9, state="normal")
+        else:
+            for i in range(1,self.pestanas.index("end")):
+                self.pestanas.tab(i, state="hidden")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
