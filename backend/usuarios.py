@@ -72,3 +72,11 @@ def delete_usuario(id):
     cur.execute("UPDATE usuarios SET estado = 'ELIMINADO' WHERE id = %s",id)
     bd.commit()
     bd.close()
+
+def get_max_id():
+    bd = conectar_bd()
+    cur = bd.cursor()
+    cur.execute("SELECT MAX(id) FROM usuarios")
+    output = cur.fetchall()
+    bd.close()
+    return output[0]
