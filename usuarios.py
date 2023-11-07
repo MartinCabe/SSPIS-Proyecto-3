@@ -66,7 +66,7 @@ class Usuarios(tk.Frame):
         self.button_usuarios_buscar = tk.Button(self, text = "Buscar", command=lambda:self.buscar_usuario())
         self.button_usuarios_nuevo = tk.Button(self, text = "Nuevo", command = lambda:self.nuevo_usuario())
         self.button_usuarios_guardar = tk.Button(self, text = "Guardar", command=lambda:self.guardar_usuario())
-        self.button_usuarios_cancelar = tk.Button(self, text = "Cancelar", command=lambda:self.cancelar_usuario())
+        self.button_usuarios_cancelar = tk.Button(self, text = "Cancelar", command=lambda:self.limpiar_campos())
         self.button_usuarios_editar = tk.Button(self, text = "Editar")
         self.button_usuarios_baja = tk.Button(self, text = "Baja")
         self.button_usuarios_buscar.grid(row = 0, column = 2, padx = 10, pady = 10)
@@ -78,35 +78,11 @@ class Usuarios(tk.Frame):
 
         self.entry_usuarios_id.config(state = "disabled")
 
-        self.button_usuarios_nuevo.config(state = "active")
-        self.button_usuarios_buscar.config(state = "active")
-        self.button_usuarios_guardar.config(state = "disabled")
-        self.button_usuarios_cancelar.config(state = "disabled")
-        self.button_usuarios_editar.config(state = "disabled")
-        self.button_usuarios_baja.config(state = "disabled")
-
     def nuevo_usuario(self):
-        self.button_usuarios_nuevo.config(state = "disabled")
-        self.button_usuarios_buscar.config(state = "disabled")
-        self.button_usuarios_guardar.config(state = "active")
-        self.button_usuarios_cancelar.config(state = "active")
-        self.button_usuarios_editar.config(state = "disabled")
-        self.button_usuarios_baja.config(state = "disabled")
-        self.entry_usuarios_id.config(state = "normal")
         self.limpiar_campos()
+        self.entry_usuarios_id.config(state = "normal")
         self.entry_usuarios_id.insert(0, int(get_max_id()[0]) + 1)
         self.entry_usuarios_id.config(state = "disabled")
-
-    def cancelar_usuario(self):
-        self.entry_usuarios_id.config(state = "normal")
-        self.limpiar_campos()
-        self.entry_usuarios_id.config(state = "disabled")
-        self.button_usuarios_nuevo.config(state = "active")
-        self.button_usuarios_buscar.config(state = "active")
-        self.button_usuarios_guardar.config(state = "disabled")
-        self.button_usuarios_cancelar.config(state = "disabled")
-        self.button_usuarios_editar.config(state = "disabled")
-        self.button_usuarios_baja.config(state = "disabled")
 
     def representar_perfil(self,seleccion):
         for x in self.perfiles:
@@ -126,12 +102,14 @@ class Usuarios(tk.Frame):
                 validar_lenght(self.entry_usuarios_username.get()),
             )
             messagebox.showinfo(title = "Aviso", message = "Usuario guardado con exito")
-            self.cancelar_usuario()
+            self.limpiar_campos()
         except ValueError:
             messagebox.showerror(title = "Error", message = "Datos invalidos o incompletos")
         
     def colocar_datos_en_entrys(self,usuario):
+        self.entry_usuarios_id.config(state = "normal")
         self.entry_usuarios_id.insert(0, usuario.id)
+        self.entry_usuarios_id.config(state = "disabled")
         self.entry_usuarios_nombre.insert(0, usuario.nombre)
         self.entry_usuarios_paterno.insert(0, usuario.apellido_paterno)
         self.entry_usuarios_materno.insert(0, usuario.apellido_materno)
@@ -141,7 +119,9 @@ class Usuarios(tk.Frame):
         self.combo_usuarios_perfil.insert(0,usuario.perfil)
     
     def limpiar_campos(self):
+        self.entry_usuarios_id.config(state = "normal")
         self.entry_usuarios_id.delete(0,END)
+        self.entry_usuarios_id.config(state = "disabled")
         self.entry_usuarios_nombre.delete(0,END)
         self.entry_usuarios_paterno.delete(0,END)
         self.entry_usuarios_materno.delete(0,END)
@@ -162,7 +142,7 @@ class Usuarios(tk.Frame):
                 'ACTIVO')) 
             update_usuario(id,usuario)
             messagebox.showinfo(title = "Aviso", message = "Usuario editado con exito")
-            self.cancelar_usuario()
+            self.limpiar_campos()
         except:
             messagebox.showerror(title = "Error", message = "Datos invalidos o incompletos")
         
@@ -172,7 +152,7 @@ class Usuarios(tk.Frame):
         if confirmar:
             delete_usuario(id)
             messagebox.showinfo(title = "Aviso", message = "Usuario eliminado con exito")
-            self.cancelar_usuario()
+            self.limpiar_campos()
         else:
             messagebox.showerror(title = "Error", message = "Operacion cancelada")
 
@@ -183,11 +163,5 @@ class Usuarios(tk.Frame):
             self.colocar_datos_en_entrys(usuario)
             self.button_usuarios_editar.config(command=lambda:self.editar_usuario(usuario.id))
             self.button_usuarios_baja.config(command=lambda:self.borrar_usuario(usuario.id))
-            self.button_usuarios_nuevo.config(state = "disabled")
-            self.button_usuarios_buscar.config(state = "active")
-            self.button_usuarios_guardar.config(state = "disabled")
-            self.button_usuarios_cancelar.config(state = "active")
-            self.button_usuarios_editar.config(state = "active")
-            self.button_usuarios_baja.config(state = "active")
         except:
             messagebox.showerror(title = "Error", message = "Dato de busqueda invalido")
