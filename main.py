@@ -11,16 +11,18 @@ from salon import Salon
 from carrera import Carrera
 from planeacion import Planeacion
 from logout import Logout
+from backend.usuarios import Usuario
 
 class MainWindow:
     def __init__(self, root):
+        self.usuario_logeado = Usuario((0, 0, '', '', '', '', '', '', '')) # Probablemente sea una pendejada, solo esperemos que no rompa nada
         self.root = root
         self.root.title("Control Escolar")
         self.root.geometry("1000x700")
         self.pestanas = ttk.Notebook(self.root)
         frame_login = Login(self.pestanas,self)
         frame_usuarios = Usuarios(self.pestanas)
-        frame_alumnos = Alumnos(self.pestanas)
+        self.frame_alumnos = Alumnos(self.pestanas, self.usuario_logeado)
         frame_maestros = Maestros(self.pestanas)
         frame_materias = Materias(self.pestanas)
         frame_grupos = Grupos(self.pestanas)
@@ -33,7 +35,7 @@ class MainWindow:
 
         self.pestanas.add(frame_login, text = "Login")
         self.pestanas.add(frame_usuarios, text = "Usuarios")
-        self.pestanas.add(frame_alumnos, text = "Alumnos")
+        self.pestanas.add(self.frame_alumnos, text = "Alumnos")
         self.pestanas.add(frame_maestros, text = "Maestros")
         self.pestanas.add(frame_materias, text = "Materias")
         self.pestanas.add(frame_grupos, text = "Grupos")
@@ -48,16 +50,20 @@ class MainWindow:
         self.pestanas.bind("<<NotebookTabChanged>>", lambda event: self.actualizar_pestanas())
         
     def actualizar_pestanas(self):
-        usuario_logeado = self.pestanas.winfo_children()[0].get_usuario_logeado()
-        if usuario_logeado:
+        self.usuario_logeado = self.pestanas.winfo_children()[0].get_usuario_logeado()
+        if self.usuario_logeado:
             self.pestanas.tab(0, state="hidden")
             for i in range(1, self.pestanas.index("end")):
-                if usuario_logeado.perfil==1:
+                if self.usuario_logeado.perfil==1:
                     self.pestanas.tab(i, state="normal")
-                elif usuario_logeado.perfil == 2:
+                elif self.usuario_logeado.perfil == 2:
                     self.pestanas.tab(2, state="normal")
                     self.pestanas.tab(3, state="normal")
-                    self.pestanas.tab(9, state="normal")
+                    self.pestanas.tab(10, state="normal")
+                elif self.usuario_logeado.perfil == 3:
+                    self.frame_alumnos.actualizar_sesion(self.usuario_logeado)
+                    self.pestanas.tab(2, state = "normal")
+                    self.pestanas.tab(10, state = "normal")
         else:
             for i in range(1,self.pestanas.index("end")):
                 self.pestanas.tab(i, state="hidden")
